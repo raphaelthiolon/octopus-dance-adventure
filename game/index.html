@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4aa8e8">
+<title>Andrea's Dance Adventure</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="scene" aria-hidden="true">
+  <div id="bubbles"></div>
+  <svg id="weed" viewBox="0 0 1000 120" preserveAspectRatio="none">
+    <g class="w1"><path d="M60 120 C30 80 90 50 55 0 C120 50 70 85 100 120 Z" fill="#2fb98a"/></g>
+    <g class="w2"><path d="M180 120 C160 90 210 60 190 20 C240 62 205 90 225 120 Z" fill="#35c79a"/></g>
+    <g class="w1"><path d="M760 120 C730 85 790 55 760 10 C820 55 780 90 805 120 Z" fill="#2fb98a"/></g>
+    <g class="w2"><path d="M900 120 C880 80 935 55 910 5 C965 55 925 85 950 120 Z" fill="#35c79a"/></g>
+  </svg>
+</div>
+<div id="topbar">
+  <button id="btnHome" class="round" aria-label="Home"></button>
+  <div class="grow"></div>
+  <div id="jar" aria-label="Candies"><span id="jarIcon"></span><b id="candyCount">0</b></div>
+  <button id="btnColl" class="round" aria-label="Unicorns"></button>
+  <button id="btnSound" class="round" aria-label="Sound"></button>
+</div>
+<main id="screen"></main>
+<div id="fx" aria-hidden="true"></div>
+<button id="parentHot" aria-label="Parent area (press and hold)"></button>
+<noscript>This game needs JavaScript.</noscript>
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/art.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
