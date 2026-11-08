@@ -491,7 +491,7 @@
   function boxScreen() {
     var t = token + 1;
     var box = h('button', { class: 'boxbtn', 'aria-label': 'Open', html: Art.gift(), onclick: function () { open(); } });
-    setScreen([h('div', { class: 'center' }, [makeGuide(), h('h1', { class: 'title', text: AD.T[lang()].surprise }), box])]);
+    setScreen([h('div', { class: 'center' }, [makeGuide(), h('h1', { class: 'title', text: AD.plain(AD.T[lang()].surprise) }), box])]);
     guideDo('cheer'); AA.sfx('reward');
     say(AD.T[lang()].surprise).then(function () { if (token === t) say(AD.T[lang()].tapBox); });
 
@@ -526,7 +526,7 @@
     var line = AD.T[lang()].cliff[state.chapters % AD.T[lang()].cliff.length];
     setScreen([h('div', { class: 'center' }, [
       makeGuide('big'),
-      h('div', { class: 'talk' }, [h('span', { class: 'cap', text: line })]),
+      h('div', { class: 'talk' }, [h('span', { class: 'cap', text: AD.plain(line) })]),
       h('div', { class: 'row' }, [bigButton('play', 'Play', startPlay, 'bigbtn'), bigButton('home', 'Home', home, 'round')])
     ])]);
     say(line);
@@ -603,23 +603,10 @@
       });
       box.appendChild(tbl);
 
-      box.appendChild(h('h3', { text: 'Voice script (for recording clips)' }));
-      var vs = h('textarea', { id: 'voice-script', placeholder: 'Press the button to list the phrases' });
-      box.appendChild(h('button', { class: 'pb', text: 'List phrases to record', onclick: function () {
-        var lines = ['Record each line as audio/voice/<language>/<name>.mp3 and list the names in audio/voice/manifest.json as {"en":[...],"fr":[...]}.', ''];
-        AD.LANGS.forEach(function (l) {
-          var seenKeys = {}, add = function (s) { var k = AA.slug(s); if (!seenKeys[k]) { seenKeys[k] = 1; lines.push(l + '/' + k + '.mp3 = ' + s); } };
-          add(AD.T[l].hello); add(AD.T[l].tryAgain); add(AD.T[l].surprise); add(AD.T[l].tapBox); add(AD.T[l].chapterDone); add(AD.T[l].allUnicorns);
-          AD.T[l].praise.forEach(add); AD.T[l].cliff.forEach(add);
-          AD.LETTER_SPEECH[l].forEach(add);
-          for (var n = 0; n <= 30; n++) add(AD.numWord(n, l));
-          [10, 20, 30, 40, 50, 60, 70, 80, 90, 100].forEach(function (n) { add(AD.numWord(n, l)); });
-          AD.NAMES[l].forEach(function (x) { add(x.say); });
-          AD.WL[l].forEach(add);
-        });
-        vs.value = lines.join('\n'); vs.select();
-      } }));
-      box.appendChild(vs);
+      box.appendChild(h('h3', { text: 'Recorded voice' }));
+      var counts = AD.LANGS.map(function (l) { return AD.LANG_NAME[l] + ': ' + AA.clipCount(l) + ' of ' + AD.recordingList(l).length + ' clips in the game'; }).join(' · ');
+      box.appendChild(h('p', { text: counts + '. A sentence uses the recording only when every piece of it is recorded; otherwise the browser voice reads it.' }));
+      box.appendChild(h('p', {}, [h('a', { class: 'pb link', href: 'record.html', target: '_blank', rel: 'noopener', text: 'Open the recording studio' })]));
 
       box.appendChild(h('h3', { text: 'Backup' }));
       var ta = h('textarea', { id: 'backup-text', placeholder: 'Paste a backup here to restore' });

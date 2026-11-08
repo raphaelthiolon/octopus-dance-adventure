@@ -169,10 +169,57 @@
 
   test('stories and narrated sums read correctly in both languages', function () {
     var a = { type: 'add', a: 12, b: 5, story: true }, s = { type: 'sub', a: 14, b: 6, story: true };
-    eq(AD.prompt(a, 'en').say, 'A unicorn has twelve candies. It finds five more. How many now?');
-    eq(AD.prompt(a, 'fr').say, 'Une licorne a douze bonbons. Elle en trouve cinq de plus. Combien en a-t-elle maintenant ?');
-    eq(AD.prompt(s, 'en').say, 'A unicorn has fourteen candies and eats six. How many are left?');
-    eq(AD.prompt({ type: 'add', a: 21, b: 9 }, 'fr').say, 'vingt et un et neuf font... ?');
+    var P = function (q, l) { return AD.plain(AD.prompt(q, l).say); };
+    eq(P(a, 'en'), 'A unicorn has twelve candies. It finds five more. How many now?');
+    eq(P(a, 'fr'), 'Une licorne a douze bonbons. Elle en trouve cinq de plus. Combien en a-t-elle maintenant ?');
+    eq(P(s, 'en'), 'A unicorn has fourteen candies and eats six. How many are left?');
+    eq(P({ type: 'add', a: 21, b: 9 }, 'fr'), 'vingt et un et neuf font... ?');
+    eq(P({ type: 'miss', word: 'cat' }, 'en'), 'cat. Which letter is missing?');
+    eq(P({ type: 'build', word: 'Papa' }, 'fr'), 'Écris Papa !');
+    eq(AD.plain(AD.answerSay({ kind: 'letter', answer: 'B' }, 'en')), 'It is bee.');
+  });
+
+  /* ---------- Recording ---------- */
+  test('every piece the voice can say is on the recording list, both languages', function () {
+    LANGS.forEach(function (l) {
+      var keys = {}; AD.recordingList(l).forEach(function (x) { keys[x.key] = 1; });
+      function need(text, where) {
+        AD.pieces(text).forEach(function (p) { ok(keys[AD.slug(p)], l + ' missing "' + p + '" from ' + where); });
+      }
+      AE.catalog(l).forEach(function (it) {
+        for (var s = 1; s <= 3; s++) {
+          var q = AE.makeQuestion(it, seeded(s * 17), l);
+          need(AD.prompt(q, l).say, it.id); need(AD.answerSay(q, l), 'answer ' + it.id);
+        }
+      });
+      ['hello', 'tryAgain', 'surprise', 'tapBox', 'allUnicorns', 'chapterDone'].forEach(function (k) { need(AD.T[l][k], k); });
+      AD.T[l].praise.concat(AD.T[l].cliff).forEach(function (t) { need(t, 'praise or cliff'); });
+      AD.UNICORNS.forEach(function (u) { need(AD.T[l].newUnicorn(u.name), 'unicorn ' + u.name); });
+      for (var n = 0; n <= 59; n++) need('|' + AD.numWord(n, l) + '|', 'number ' + n);
+      AD.WL[l].forEach(function (w) { need(w, 'word'); });
+      AD.LETTER_SPEECH[l].forEach(function (w) { need(w, 'letter'); });
+    });
+  });
+
+  test('recording list: unique file names, essentials smaller than everything, key groups present', function () {
+    LANGS.forEach(function (l) {
+      var list = AD.recordingList(l), seen = {};
+      list.forEach(function (x) { ok(x.key && x.text, 'empty'); ok(!seen[x.key], 'duplicate key ' + x.key); seen[x.key] = 1; ok(/^[a-z0-9-]+$/.test(x.key), 'bad key ' + x.key); });
+      var t1 = list.filter(function (x) { return x.tier === 1; }).length;
+      ok(t1 >= 80 && t1 < list.length, l + ' essentials ' + t1 + ' of ' + list.length);
+      ['Phrases', 'Numbers', 'Names', 'Picture words', 'Unicorn names'].forEach(function (g) { ok(list.some(function (x) { return x.group === g; }), 'group ' + g); });
+      eq(list.filter(function (x) { return /^Letter /.test(x.group); }).length, 26, l + ' letter names');
+    });
+  });
+
+  test('wav and zip writers: valid header, known CRC, exact sizes', function () {
+    var T = window.StudioTools; ok(T, 'studio tools loaded');
+    var w = T.wavBlob(new Float32Array(100)); eq(w.size, 44 + 200, 'wav size');
+    eq(T.crc32(new TextEncoder().encode('123456789')), 0xCBF43926, 'crc32 check value');
+    var a = new Uint8Array([1, 2, 3, 4, 5]), b = new Uint8Array(1000);
+    var z = T.makeZip([{ name: 'audio/voice/en/a.wav', data: a }, { name: 'audio/voice/manifest.json', data: b }]);
+    var n1 = 'audio/voice/en/a.wav'.length, n2 = 'audio/voice/manifest.json'.length;
+    eq(z.size, (30 + n1 + 5) + (30 + n2 + 1000) + (46 + n1) + (46 + n2) + 22, 'zip size');
   });
 
   /* ---------- Levels and items ---------- */

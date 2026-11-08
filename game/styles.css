@@ -136,6 +136,7 @@ button:focus-visible { outline: 5px solid var(--gold); outline-offset: 3px; }
 .ch.sm { width: clamp(78px, 19vmin, 130px); height: clamp(78px, 19vmin, 130px); font-size: clamp(40px, 10vmin, 70px); }
 .ch-card.wide { width: auto; min-width: clamp(96px, 26vmin, 190px); padding: 0 18px; font-size: clamp(30px, 8vmin, 58px); }
 .ch-card.pic { font-size: clamp(54px, 15vmin, 110px); }
+.parent a.pb.link { display: inline-block; text-decoration: none; }
 .parent select { font: inherit; max-width: 100%; padding: 6px; }
 .parent input[type=range] { width: min(320px, 70%); vertical-align: middle; }
 .parent .note { font-size: 15px; color: #5b4d8a; }

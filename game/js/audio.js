@@ -149,15 +149,18 @@
     return cfg;
   };
 
-  AA.slug = function (text) {
-    return AD.stripAccent(text.toLowerCase()).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
-  };
+  AA.slug = AD.slug;
 
-  /* Optional recorded clips: audio/voice/manifest.json lists {en:[slugs], fr:[slugs]}. */
+  /* Optional recorded clips: audio/voice/manifest.json lists {en:[slugs], fr:[slugs]}; files are audio/voice/<lang>/<slug>.wav. */
   AA.loadManifest = function () {
     try {
       fetch('audio/voice/manifest.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { manifest = j; }).catch(function () { manifest = null; });
     } catch (e) { manifest = null; }
+  };
+  AA.clipCount = function (lang) { return manifest && manifest[lang] ? manifest[lang].length : 0; };
+  AA.clipsCover = function (text, lang) {
+    var p = AD.pieces(text);
+    return !!(manifest && manifest[lang] && p.length && p.every(function (x) { return manifest[lang].indexOf(AD.slug(x)) >= 0; }));
   };
 
   AA.stopSpeech = function () {
@@ -195,19 +198,26 @@
         resolve();
       }
       speaking++; duck(true);
-      var key = AA.slug(text);
-      if (manifest && manifest[lang] && manifest[lang].indexOf(key) >= 0) {
-        try {
-          AA.stopSpeech();
-          clip = new Audio('audio/voice/' + lang + '/' + key + '.mp3');
-          clip.onended = done;
-          clip.onerror = function () { clip = null; speakTTS(text, lang, done); };
-          var p = clip.play(); if (p && p.catch) p.catch(function () { clip = null; speakTTS(text, lang, done); });
-          setTimeout(done, 6000);
-          return;
-        } catch (e) { /* fall through to the browser voice */ }
+      var plain = AD.plain(text);
+      if (AA.clipsCover(text, lang)) {
+        /* Every piece of the sentence has a recording: play them one after another. */
+        var pieces = AD.pieces(text), i = 0, dead = false;
+        AA.stopSpeech();
+        var fallback = function () { if (dead) return; dead = true; if (clip) { try { clip.pause(); } catch (e) { /* ignore */ } clip = null; } speakTTS(plain, lang, done); };
+        var next = function () {
+          if (dead) return;
+          if (i >= pieces.length) { clip = null; done(); return; }
+          try {
+            clip = new Audio('audio/voice/' + lang + '/' + AD.slug(pieces[i++]) + '.wav');
+            clip.onended = next; clip.onerror = fallback;
+            var p = clip.play(); if (p && p.catch) p.catch(fallback);
+          } catch (e) { fallback(); }
+        };
+        setTimeout(function () { if (!dead && !finished) { dead = true; done(); } }, 3000 + pieces.length * 2500);
+        next();
+        return;
       }
-      speakTTS(text, lang, done);
+      speakTTS(plain, lang, done);
     });
   };
 
