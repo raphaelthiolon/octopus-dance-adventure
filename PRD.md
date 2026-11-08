@@ -1,6 +1,6 @@
 # PRD: Alphabet and numbers game for Andrea
 
-Version 0.2, 2026-11-07. Phase 1 built (see section 8); not yet playtested with Andrea. Single source of truth for scope, requirements and phases. Items marked `[TO CONFIRM]` need Raphael's answer. Items marked `[GUESS]` are my starting values, to tune after playtests.
+Version 0.3, 2026-11-08. Phase 1 built and first playtest done (feedback: voice, too easy, too number-heavy). Version 1.1 changes are in section 8. Single source of truth for scope, requirements and phases. Items marked `[TO CONFIRM]` need Raphael's answer. Items marked `[GUESS]` are my starting values, to tune after playtests.
 
 ## 1. Summary
 
@@ -118,6 +118,14 @@ Starting level and target range `[TO CONFIRM]`. Proposed ladder, each step unloc
 4. **Polish and publish:** tablet testing, performance, hosting choice `[TO CONFIRM]`, private audio excluded from any host.
 
 Phase 1 as built: 5 levels (letters A to E, counting 1 to 10, upper/lower case, first letter of a picture word, addition within 5, within 10, make 10), 10-task chapters, surprise box with 8 collectible unicorns, candies, octopus guide, waltz music, parent area. Not in phase 1 yet: letter sounds, addition 11 to 20, unicorn care, more worlds, songs, video, recorded voice. Picture words and counting objects use emoji (not original art) `[TO CONFIRM]`.
+
+**Version 1.1 (2026-11-08), after Andrea's first playtest.** Feedback: the voice is poor and not young or fun, the maths is too easy, letters are too easy and numbers dominate. Changes:
+- **Two tracks.** Letters and numbers each have their own level and alternate about 50/50 (never three of one kind in a row). Levels rise after 3 first-try correct answers in that track and fall after 2 misses. Letters go to level 8, numbers to level 10.
+- **Letters:** all 26 letters (names, upper/lower case), first letter of a picture (21 letters), alphabet gaps (A _ C), odd one out by first letter, missing letter in a word or name (Andrea, Daddy, Mummy / Papa, Maman), spell a word by tapping scrambled letters (3 to 6 letters, names included), pick the written word for a picture. About 60 picture words per language.
+- **Numbers:** counting to 20, number patterns (steps of 1, 2, 5, 10, also counting back), bigger/smaller to 30, addition to 30 (teens, bridging ten, tens plus ones), subtraction within 20, missing number (a + ? = b, make 10 and 20), doubles to 15, halves of even numbers to 20, tens and ones to 59, equal groups (2 to 5 groups of 2, 3 or 5, up to 25). Story versions of sums with a unicorn from level 6.
+- **Curriculum basis:** England Year 1 (number bonds and subtraction within 20, groups and sharing, doubling and halving) and the French CP cycle 2 programme 2024 (doubles to 10, halves of even numbers to 20, mental calculation within 100) [sources in MEMORY.md]. The exact Year 1 and CP wording was not checked against the original documents `[TO CONFIRM]`.
+- **Voice:** the game now picks the best female browser voice per language (favouring "Natural" and child-like voices where installed), with a higher pitch. The parent area has a voice picker, pitch and speed, and a Test button. Recorded clips are supported (`audio/voice/manifest.json`) and the parent area lists every phrase to record. A truly young, fun voice needs recordings `[TO CONFIRM]`.
+- **Not in 1.1:** letter sounds, recorded voice, songs, video, more worlds, unicorn care.
 
 Playtest with Andrea after phases 1, 2 and 3. Feedback goes back to me in one batch.
 
